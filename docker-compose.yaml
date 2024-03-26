@@ -1,0 +1,32 @@
+version: '3'
+services:
+  capps-launcher-storage:
+    image: redis/redis-stack:7.2.0-v3
+    container_name: capps-launcher-storage
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+
+  capps-launcher-app:
+    build: src/app
+    image: capps-launcher-app:1.0
+    container_name: capps-launcher-app
+    environment:
+      - PORT=8080
+      - ANALYTICS_PORT=8081
+    ports:
+      - "8080:8080"
+    depends_on:
+     - capps-launcher-analytics
+     - capps-launcher-storage
+
+  capps-launcher-analytics:
+    build: src/analytics
+    image: capps-launcher-analytics:1.0
+    container_name: capps-launcher-analytics
+    environment:
+      - PORT=8081
+    ports:
+      - "8081:8081"
+    depends_on:
+     - capps-launcher-storage
